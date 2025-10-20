@@ -1,0 +1,11 @@
+{
+	"folders": [
+		{
+			"path": "../../docker/k8/App-Ingress-TLS"
+		},
+		{
+			"path": "../../docker/k8/Cluster-Infrastructure"
+		}
+	],
+	"settings": {}
+}
