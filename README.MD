@@ -1,91 +1,117 @@
-# 🌐 NGINX Terraform Project - Abdikarim's Lab
+# 🚀 NGINX Terraform Lab & AWS Infrastructure
 
-Welcome to my **NGINX on AWS Terraform Project**! This project demonstrates how to provision an **EC2 instance**, run **NGINX**, configure an **Application Load Balancer (ALB)**, secure it with **HTTPS using ACM**, and manage **DNS with Route 53** — all automated with **Terraform**.  
-
----
-
-## 🛠 Project Overview
-
-- **EC2 Instance:** Ubuntu server running NGINX
-- **Load Balancer:** Application Load Balancer (ALB) distributing traffic
-- **Security:** Custom Security Group allowing HTTP, HTTPS, and SSH
-- **Domain:** `abdikarim.co.uk` (subdomain: `nginx.abdikarim.co.uk`)
-- **HTTPS:** ACM certificate for secure access
-- **Infrastructure as Code:** Terraform scripts for automation
+Deploy an EC2 instance running **NGINX**, configure **ALB**, secure it with **ACM TLS**, and manage **DNS via Route53** using Terraform.
 
 ---
 
-## 📂 Project Structure
+## 📦 Project Structure
 
-```text
-nginx-terraform-lab/
-│
-├─ main.tf             # Provider configuration & backend
-├─ ec2.tf              # EC2 instance and user_data
-├─ alb.tf              # Application Load Balancer & Target Group
-├─ sg.tf               # Security Group for EC2 & ALB
-├─ acm.tf              # ACM Certificate & Validation
-├─ route53.tf          # Route 53 DNS A record
-├─ terraform.tfvars    # Variables like domain_name, key_name, etc.
-├─ variables.tf        # Variable declarations
-└─ outputs.tf          # Outputs like ALB DNS
-⚡ Features
-Custom NGINX landing page hosted on the EC2 instance
+### Phase 1: Infrastructure
 
-Health checks configured on ALB to monitor EC2 instance
+- `main.tf`: AWS provider configuration & backend  
+- `vpc.tf` *(optional)*: Networking (VPC, subnets, IGW)  
+- `sg.tf`: Security Groups for EC2 & ALB  
+- `ec2.tf`: EC2 instance setup and user_data for NGINX  
+- `alb.tf`: Application Load Balancer & Target Group  
+- `acm.tf`: ACM Certificate creation & validation  
+- `route53.tf`: Route 53 DNS record setup  
+- `variables.tf`: Input variables  
+- `outputs.tf`: Terraform outputs  
+- `terraform.tfvars`: Variable values like domain_name & key_name  
 
-Security Group shared between ALB and EC2
+### Phase 2: Application Deployment
 
-Automatic Route 53 A record creation for your subdomain
+- NGINX content served on EC2 (`/var/www/html/index.nginx-debian.html`)  
+- Health check configuration for ALB target group  
+- Automatic DNS & HTTPS provisioning  
 
-HTTPS enabled via ACM for secure connection
+---
 
-🚀 Deployment Steps
-Follow these steps to deploy the project:
+## ⚠️ Initial Problems
 
-Clone the repository:
+- EC2 not reachable via SSH  
+- ACM validation errors  
+- ALB → EC2 traffic blocked  
+- Subnet/VPC filter issues  
 
-bash
-Copy code
-git clone <your-repo-url>
-cd nginx-terraform-lab
-Edit terraform.tfvars with your variables:
+> **Reason:** Resource dependencies and configuration mismatches (key pairs, SG rules, AMI/instance type).
 
-h
-Copy code
-domain_name = "abdikarim.co.uk"
-key_name    = "your-aws-key-name"
+---
+
+## 🛠️ Solution: Step-by-Step Deployment
+
+### Phase 1 – Infrastructure
+
+1. **Prepare Terraform Variables:**  
+   Edit `terraform.tfvars` with your domain and key pair:
+
+   ```hcl
+   domain_name = "abdikarim.co.uk"
+   key_name    = "your-aws-key-name"
 Initialize Terraform:
 
 bash
 Copy code
 terraform init
-Validate configuration:
+Validate Configuration:
 
 bash
 Copy code
 terraform validate
-Plan the deployment:
+Plan Deployment:
 
 bash
 Copy code
 terraform plan -var-file="terraform.tfvars"
-Apply the deployment:
+Apply Deployment:
 
 bash
 Copy code
 terraform apply -var-file="terraform.tfvars"
-Access Your NGINX Page:
+Outcome: EC2 instance, ALB, Security Groups, ACM certificate, and DNS record are created.
 
-Visit http://nginx.abdikarim.co.uk
+Phase 2 – Application & NGINX Page
+Customize your NGINX landing page:
 
-HTTPS version will work after ACM certificate validation
+bash
+Copy code
+sudo nano /var/www/html/index.nginx-debian.html
+Health check ensures ALB routes traffic only to healthy EC2 instances
 
-🔐 Notes
-Ensure your AWS key pair exists and is referenced in terraform.tfvars.
+Confirm DNS record points to ALB, and HTTPS is active
 
-Security Group allows traffic from ALB → EC2 on port 80.
+✅ Verification
+Check EC2 instance:
 
-NGINX content can be customized via /var/www/html/index.nginx-debian.html.
+bash
+Copy code
+ssh -i <your-key>.pem ubuntu@<ec2-public-ip>
+curl http://localhost
+Check ALB:
 
-You can automate HTML page deployment using user_data in Terraform.
+bash
+Copy code
+aws elbv2 describe-target-health --target-group-arn <target-group-arn>
+Access the website:
+
+arduino
+Copy code
+http://nginx.abdikarim.co.uk
+https://nginx.abdikarim.co.uk
+🏆 Key Learnings
+Separate infrastructure & app configuration: Ensures dependencies are ready before workloads.
+
+ACM validation requires DNS control: Must create Route53 record or point NS from external registrar.
+
+Security Groups matter: ALB must have access to EC2; EC2 allows ALB traffic on port 80.
+
+Instance type & AMI architecture must match (x86_64 vs arm64).
+
+Customize NGINX content via user_data or directly in /var/www/html.
+
+Enjoy your automated, secure NGINX deployment on AWS!
+
+🌟 Author
+Abdikarim Yusuf
+DevOps Enthusiast | Cloud Learner | Automation Lover
+LinkedIn | GitHub
