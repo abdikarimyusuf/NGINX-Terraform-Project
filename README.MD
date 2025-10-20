@@ -23,59 +23,32 @@ Automatic DNS & HTTPS provisioning
 ---
 
 ## 🛠️ Deployment & Verification
-
-**Initialize Terraform**
+Initialize Terraform
 terraform init
 
-text
-
-**Validate Configuration**
+Validate Configuration
 terraform validate
 
-text
-
-**Plan Deployment**
+Plan Deployment
 terraform plan -var-file="terraform.tfvars"
 
-text
-
-**Apply Deployment**
+Apply Deployment
 terraform apply -var-file="terraform.tfvars"
 
-text
-
-_Outcome: EC2 instance, ALB, Security Groups, ACM certificate, and DNS record are created._
-
----
-
-**Customize your NGINX landing page:**
+Outcome:
+EC2 instance, ALB, Security Groups, ACM certificate, and DNS record are created.
+Customize your NGINX landing page
 sudo nano /var/www/html/index.nginx-debian.html
 
-text
-_Health check: ALB routes traffic only to healthy EC2 instances._
-
-_Confirm DNS: Ensure the Route 53 record points to your ALB, and HTTPS is active._
-
----
-
-**Verification**
-
-_Check EC2 instance:_
+Health check: ALB routes traffic only to healthy EC2 instances.
+Confirm DNS: Ensure the Route 53 record points to your ALB, and HTTPS is active.
+Verification
+Check EC2 instance
 ssh -i <your-key>.pem ubuntu@<ec2-public-ip>
 curl http://localhost
 
-text
-
-_Check ALB health:_
+Check ALB health
 aws elbv2 describe-target-health --target-group-arn <target-group-arn>
-
-text
-
-_Access your website:_
-- http://nginx.abdikarim.co.uk
-- https://nginx.abdikarim.co.uk
-
----
 
 ## 🏆 Key Learnings
 
