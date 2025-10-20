@@ -6,10 +6,7 @@ Deploy an **EC2 instance running NGINX**, configure an **ALB**, secure it with *
 
 ## 📦 Project Structure
 
-### Phase 1: Infrastructure
-
 - `main.tf`: AWS provider configuration & backend  
-- `vpc.tf` *(optional)*: Networking (VPC, subnets, IGW)  
 - `sg.tf`: Security Groups for EC2 & ALB  
 - `ec2.tf`: EC2 instance setup and `user_data` for NGINX  
 - `alb.tf`: Application Load Balancer & Target Group  
@@ -19,98 +16,80 @@ Deploy an **EC2 instance running NGINX**, configure an **ALB**, secure it with *
 - `outputs.tf`: Terraform outputs  
 - `terraform.tfvars`: Variable values like `domain_name` & `key_name`  
 
-### Phase 2: Application Deployment
-
-- Custom NGINX landing page served on EC2 (`/var/www/html/index.nginx-debian.html`)  
-- Health check configured for ALB target group  
-- Automatic DNS & HTTPS provisioning  
+Custom NGINX landing page served on EC2 (`/var/www/html/index.nginx-debian.html`)  
+Health check configured for ALB target group  
+Automatic DNS & HTTPS provisioning  
 
 ---
 
-## ⚠️ Initial Problems
+## 🛠️ Deployment & Verification
 
-- EC2 instance not reachable via SSH  
-- ACM certificate validation errors  
-- ALB → EC2 traffic blocked  
-- Subnet/VPC filtering issues  
-
-> **Reason:** Resource dependencies and configuration mismatches (key pairs, security groups, AMI/instance type).
-
----
-
-## 🛠️ Deployment Steps
-
-### Phase 1 – Infrastructure
-
-1. **Configure Terraform Variables**  
-
-   ```hcl
-   domain_name = "abdikarim.co.uk"
-   key_name    = "your-aws-key-name"
-Initialize Terraform
-
-bash
-Copy code
+**Initialize Terraform**
 terraform init
-Validate Configuration
 
-bash
-Copy code
+text
+
+**Validate Configuration**
 terraform validate
-Plan Deployment
 
-bash
-Copy code
+text
+
+**Plan Deployment**
 terraform plan -var-file="terraform.tfvars"
-Apply Deployment
 
-bash
-Copy code
+text
+
+**Apply Deployment**
 terraform apply -var-file="terraform.tfvars"
-Outcome: EC2 instance, ALB, Security Groups, ACM certificate, and DNS record are created.
 
-Phase 2 – Application & NGINX Page
-Customize your NGINX landing page:
+text
 
-bash
-Copy code
+_Outcome: EC2 instance, ALB, Security Groups, ACM certificate, and DNS record are created._
+
+---
+
+**Customize your NGINX landing page:**
 sudo nano /var/www/html/index.nginx-debian.html
-Health check: ALB routes traffic only to healthy EC2 instances.
 
-Confirm DNS: Ensure the Route 53 record points to your ALB, and HTTPS is active.
+text
+_Health check: ALB routes traffic only to healthy EC2 instances._
 
-✅ Verification
-Check EC2 instance:
+_Confirm DNS: Ensure the Route 53 record points to your ALB, and HTTPS is active._
 
-bash
-Copy code
+---
+
+**Verification**
+
+_Check EC2 instance:_
 ssh -i <your-key>.pem ubuntu@<ec2-public-ip>
 curl http://localhost
-Check ALB health:
 
-bash
-Copy code
+text
+
+_Check ALB health:_
 aws elbv2 describe-target-health --target-group-arn <target-group-arn>
-Access your website:
 
-arduino
-Copy code
-http://nginx.abdikarim.co.uk
-https://nginx.abdikarim.co.uk
-🏆 Key Learnings
-Separate infrastructure & app configuration: Ensures dependencies are ready before workloads.
+text
 
-ACM validation requires DNS control: Must create Route 53 record or point NS from external registrar.
+_Access your website:_
+- http://nginx.abdikarim.co.uk
+- https://nginx.abdikarim.co.uk
 
-Security Groups matter: ALB must have access to EC2; EC2 allows ALB traffic on port 80.
+---
 
-Instance type & AMI architecture must match (x86_64 vs arm64).
+## 🏆 Key Learnings
 
-Customize NGINX content via user_data or directly in /var/www/html.
+- Separate infrastructure & app configuration: Ensures dependencies are ready before workloads.
+- ACM validation requires DNS control: Must create Route 53 record or point NS from external registrar.
+- Security Groups matter: ALB must have access to EC2; EC2 allows ALB traffic on port 80.
+- Instance type & AMI architecture must match (x86_64 vs arm64).
+- Customize NGINX content via user_data or directly in /var/www/html.
+- Enjoy your automated, secure NGINX deployment on AWS!
 
-Enjoy your automated, secure NGINX deployment on AWS!
+---
 
-🌟 Author
-Abdikarim Yusuf
-DevOps Enthusiast | Cloud Learner | Automation Lover
-LinkedIn | GitHub
+## 🌟 Author
+
+**Abdikarim Yusuf**  
+DevOps Enthusiast | Cloud Learner | Automation Lover  
+[LinkedIn](https://www.linkedin.com/in/abdikarim-yusuf-2177b7185/) | [GitHub](https://github.com/abdikarimyusuf)
